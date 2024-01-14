@@ -20,8 +20,10 @@ namespace Flappy_Bird_Windows_Form
         int pipeSpeed = 8; // default pipe speed defined with an integer
         int gravity = 15; // default gravity speed defined with an integer
         int score = 0; // default score integer set to 0
-        private FlappyBird flappyBirdInstance;
-        private IGameState gameState;
+        private FlappyBird flappyBirdInstance; //Singleton Variable
+        private IGameState gameState; //State Variable
+        private Dictionary<string, PipeFlyweight> pipeFlyweights = new Dictionary<string, PipeFlyweight>(); //Flyweight Variable
+
         // variable ends
 
         public Form1()
@@ -92,6 +94,7 @@ namespace Flappy_Bird_Windows_Form
             public PlayingState(Form1 form)
             {
                 this.form = form;
+                form.InitializePipeFlyweights();
             }
 
             public void UpdateState()
@@ -106,13 +109,13 @@ namespace Flappy_Bird_Windows_Form
                 if (form.pipeBottom.Left < -150)
                 {
                     // if the bottom pipes location is -150 then we will reset it back to 800 and add 1 to the score
-                    form.pipeBottom.Left = 800;
+                    form.UpdatePipePosition(form.pipeBottom, "Bottom");
                     form.score++;
                 }
                 if (form.pipeTop.Left < -180)
                 {
                     // if the top pipe location is -180 then we will reset the pipe back to the 950 and add 1 to the score
-                    form.pipeTop.Left = 950;
+                    form.UpdatePipePosition(form.pipeTop, "Top");
                     form.score++;
                 }
 
@@ -167,8 +170,31 @@ namespace Flappy_Bird_Windows_Form
                 form.gameTimer.Start();
             }
         }
+        //Method for Initialize Pipe with Flyweight Pattern
+        private void InitializePipeFlyweights()
+        {
+            // Initialize different pipe configurations
+            AddPipeFlyweight("Bottom", 800);
+            AddPipeFlyweight("Bottom", 900);
+            AddPipeFlyweight("Top", 950);
+            AddPipeFlyweight("Top", 1050);
+        }
+        private void AddPipeFlyweight(string key, int initialLeft)
+        {
+            if (!pipeFlyweights.ContainsKey(key))
+            {
+                pipeFlyweights.Add(key, new PipeFlyweight(initialLeft));
+            }
+        }
+        public void UpdatePipePosition(PictureBox pipe, string pipeType)
+        {
+            PipeFlyweight flyweight = pipeFlyweights[pipeType];
 
+            pipe.Left -= pipeSpeed;
+            pipe.Left = flyweight.InitialLeft;
 
+            // Additional logic for updating other properties of the pipe if needed
+        }
 
     }
 
@@ -204,5 +230,14 @@ namespace Flappy_Bird_Windows_Form
         void UnpauseGame();
     }
 
+    //Flyweight Design Pattern
+    public class PipeFlyweight
+    {
+        public int InitialLeft { get; private set; }
 
+        public PipeFlyweight(int initialLeft)
+        {
+            InitialLeft = initialLeft;
+        }
+    }
 }
