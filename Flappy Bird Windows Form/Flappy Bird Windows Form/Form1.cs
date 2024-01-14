@@ -175,9 +175,7 @@ namespace Flappy_Bird_Windows_Form
         {
             // Initialize different pipe configurations
             AddPipeFlyweight("Bottom", 800);
-            AddPipeFlyweight("Bottom", 900);
             AddPipeFlyweight("Top", 950);
-            AddPipeFlyweight("Top", 1050);
         }
         private void AddPipeFlyweight(string key, int initialLeft)
         {
